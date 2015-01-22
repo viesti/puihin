@@ -43,5 +43,11 @@
     (d/transact conn schema)
     (let [tempids (:tempids @(d/transact conn (document-like-tree-data temp-root-id)))
           root-entity-id (d/resolve-tempid (d/db conn) tempids temp-root-id)]
-      (println "It's a map!")
-      (clojure.pprint/pprint (d/pull (d/db conn) '[*] root-entity-id)))))
+      (println "The whole tree as a map with query:" '[*])
+      (clojure.pprint/pprint (d/pull (d/db conn) '[*] root-entity-id))
+      (println "Only leafs with query:" '[{:node/children
+                                           [{:node/children
+                                             [:node/text]}]}])
+      (clojure.pprint/pprint (d/pull (d/db conn) '[{:node/children
+                                                    [{:node/children
+                                                      [:node/text]}]}] root-entity-id)))))
