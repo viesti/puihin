@@ -181,3 +181,18 @@
 ; Now it should work
 (pp (d/transact conn data-with-audit))
 (pp (d/pull (d/db conn) '[*] root-entity-id))
+
+;; Let's monitor transactions
+(def tx-reports (d/tx-report-queue conn))
+(pp (.peek tx-reports))
+
+;; What if
+(def maybe-tx (d/with (d/db conn) [{:db/id root-entity-id :node/text "moi"}]))
+(pp (d/q `[:find ?text
+           :where
+           [~root-entity-id :node/text ?text]]
+         (:db-after maybe-tx)))
+
+;; With all of history at our hands
+(def db-all-history (d/history (d/db conn)))
+(pp (d/q '[:find ?text :where [_ :node/text ?text]] db-all-history))
